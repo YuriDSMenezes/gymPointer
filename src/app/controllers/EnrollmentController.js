@@ -31,16 +31,13 @@ class EnrollmenteController {
 
     const plan = await Plan.findByPk(plan_id);
 
-    const startDate = startOfHour(start_date);
+    const startDate = startOfHour(parseISO(start_date));
 
     const { duration, price } = plan;
 
     const priceTotal = price * duration;
 
     const endDate = addMonths(startDate, duration);
-
-    console.log(startDate);
-    console.log(endDate);
 
     const enrollment = await Enrollment.create({
       student_id,
@@ -49,6 +46,8 @@ class EnrollmenteController {
       end_date: endDate,
       price: priceTotal,
     });
+
+    console.log(start_date);
 
     const email = await Enrollment.findByPk(plan_id, {
       include: [

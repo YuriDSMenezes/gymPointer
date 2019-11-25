@@ -4,7 +4,7 @@ import SessionController from './app/controllers/SessionController';
 import StudentController from './app/controllers/StudentController';
 import PlanController from './app/controllers/PlanController';
 import EnrollmentController from './app/controllers/EnrollmentController';
-import CheckinsController from './app/controllers/CheckinsController';
+import CheckinsController from './app/controllers/CheckinController';
 
 import authMiddleware from './app/middlewares/auth';
 
@@ -32,6 +32,5 @@ routes.delete('/plans', PlanController.destroy);
 routes.get('/enrollments', EnrollmentController.index);
 routes.post('/enrollments', EnrollmentController.store);
 
-routes.post('/checkins', CheckinsController.store);
-
+routes.post('/students/checkins/:id', CheckinsController.store);
 export default routes;

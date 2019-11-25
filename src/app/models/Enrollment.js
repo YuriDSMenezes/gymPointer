@@ -5,8 +5,8 @@ class Enrollment extends Model {
     // chamando o init do model (pai)
     super.init(
       {
-        start_date: Sequelize.INTEGER,
-        end_date: Sequelize.INTEGER,
+        start_date: Sequelize.DATE,
+        end_date: Sequelize.DATE,
         price: Sequelize.INTEGER,
       },
       {

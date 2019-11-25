@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import mongoose from 'mongoose';
 
 import User from '../app/models/User';
 import Student from '../app/models/Student';
@@ -12,6 +13,7 @@ const models = [User, Student, Plan, Enrollment];
 class Database {
   constructor() {
     this.init();
+    this.mongo();
   }
 
   // faz a conexão com a base de dados
@@ -22,6 +24,14 @@ class Database {
     models.map(
       model => model.associate && model.associate(this.connection.models) // so chama o método associate se ele estiver setado
     );
+  }
+
+  mongo() {
+    this.connection = mongoose.connect('mongodb://localhost:27017/gympointer', {
+      useNewUrlParser: true,
+      useFindAndModify: true,
+      useUnifiedTopology: true,
+    });
   }
 }
 
