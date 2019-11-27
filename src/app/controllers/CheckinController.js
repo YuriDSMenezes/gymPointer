@@ -1,21 +1,31 @@
+import { subDays, startOfDay, endOfDay } from 'date-fns';
 import Checkin from '../schemas/Checkin';
 
 class CheckinController {
   async store(req, res) {
     const { id } = req.params;
 
-    const checkinsCount = await Checkin.find({
-      where: { student_id: id },
-    }).countDocuments();
+    const today = startOfDay(new Date());
 
-    if (checkinsCount === 2) {
-      return res.status(400).json('opa');
+    const lastDayChekin = subDays(today, 7);
+
+    const checkinsCount = await Checkin.find({
+      student_id: id,
+    })
+      .gte('createdAt', startOfDay(lastDayChekin))
+      .lte('createdAt', endOfDay(today))
+      .countDocuments();
+
+    if (checkinsCount >= 5) {
+      return res
+        .status(400)
+        .json({ error: 'You can do just 5 check-ins in one week' });
     }
 
-    const checkins = await Checkin.create({
+    const checkin = await Checkin.create({
       student_id: id,
     });
-    return res.json(checkins);
+    return res.json(checkin);
   }
 }
 

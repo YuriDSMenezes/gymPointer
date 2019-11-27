@@ -29,6 +29,12 @@ class EnrollmenteController {
   async store(req, res) {
     const { student_id, plan_id, start_date } = req.body;
 
+    const student = await Student.findByPk(student_id);
+
+    if (!student) {
+      res.status(400).json({ error: 'Student not exists' });
+    }
+
     const plan = await Plan.findByPk(plan_id);
 
     const startDate = startOfHour(parseISO(start_date));
@@ -46,8 +52,6 @@ class EnrollmenteController {
       end_date: endDate,
       price: priceTotal,
     });
-
-    console.log(start_date);
 
     const email = await Enrollment.findByPk(plan_id, {
       include: [
