@@ -7,6 +7,7 @@ class Helps extends Model {
       {
         question: Sequelize.STRING,
         answer: Sequelize.STRING,
+        answered: Sequelize.BOOLEAN,
       },
       {
         sequelize,

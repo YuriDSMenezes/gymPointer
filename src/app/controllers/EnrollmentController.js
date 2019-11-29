@@ -1,9 +1,11 @@
 import { startOfHour, parseISO, addMonths } from 'date-fns';
+import * as Yup from 'yup';
 import Enrollment from '../models/Enrollment';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
 
-import Mail from '../../lib/Mail';
+import EnrollmentMail from '../jobs/EnrollmentMail';
+import Queue from '../../lib/Queue';
 
 class EnrollmenteController {
   async index(req, res) {
@@ -27,6 +29,16 @@ class EnrollmenteController {
   }
 
   async store(req, res) {
+    const schema = Yup.object().shape({
+      student_id: Yup.number().required(),
+      plan_id: Yup.number().required(),
+      start_date: Yup.string().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validations fails' });
+    }
+
     const { student_id, plan_id, start_date } = req.body;
 
     const student = await Student.findByPk(student_id);
@@ -53,26 +65,15 @@ class EnrollmenteController {
       price: priceTotal,
     });
 
-    const email = await Enrollment.findByPk(plan_id, {
-      include: [
-        {
-          model: Student,
-          as: 'student',
-          attributes: ['name', 'email'],
-        },
-      ],
-    });
+    console.log(plan.id);
 
-    await Mail.sendMail({
-      to: `${email.student.name} <${email.student.email}>`,
-      subject: 'Matrícula criada com sucesso!',
-      template: 'Enrollments',
-      context: {
-        student: email.student.name,
-        plan: 123,
-        // end_date,
-        price,
-      },
+    const email = await Student.findByPk(student_id);
+
+    await Queue.add(EnrollmentMail.key, {
+      email,
+      plan_id,
+      endDate,
+      priceTotal,
     });
 
     return res.json(enrollment);

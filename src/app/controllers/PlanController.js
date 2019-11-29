@@ -1,7 +1,18 @@
+import * as Yup from 'yup';
 import Plan from '../models/Plan';
 
 class PlanController {
   async store(req, res) {
+    const schema = Yup.object().shape({
+      title: Yup.string().required(),
+      duration: Yup.string().required(),
+      price: Yup.string().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validations fails' });
+    }
+
     const { title, duration, price } = req.body;
 
     const planExists = await Plan.findOne({ where: { title: req.body.title } });
@@ -26,6 +37,16 @@ class PlanController {
   }
 
   async update(req, res) {
+    const schema = Yup.object().shape({
+      title: Yup.string(),
+      duration: Yup.number(),
+      price: Yup.number(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validations fails' });
+    }
+
     const { title } = req.body;
 
     const plan = await Plan.findOne({ where: { title: req.body.title } });
@@ -40,6 +61,14 @@ class PlanController {
   }
 
   async destroy(req, res) {
+    const schema = Yup.object().shape({
+      title: Yup.string().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validations fails' });
+    }
+
     const plan = await Plan.findOne({ where: { title: req.body.title } });
 
     if (!plan) {

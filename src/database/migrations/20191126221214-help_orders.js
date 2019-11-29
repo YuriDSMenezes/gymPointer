@@ -29,6 +29,7 @@ module.exports = {
       },
       answer_at: {
         type: Sequelize.DATE,
+        defaultValue: new Date(),
       },
       created_at: {
         type: Sequelize.DATE,
